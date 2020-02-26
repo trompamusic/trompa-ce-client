@@ -1,10 +1,10 @@
 # Generate GraphQL queries for mutations pertaining to digital document objects.
 from trompace.exceptions import UnsupportedLanguageException, MimeTypeException
 from . import StringConstant
-from .templates import mutation_create, mutation_delete, mutation_update, mutation_link
+from .templates import mutation_create, mutation_delete, mutation_link
 from ..constants import SUPPORTED_LANGUAGES
 
-ADD_DIGITAL_DOCUMENT_BROAD_MATCH = '''AddDigitalDocumentBroadMatch(
+ADD_MUSIC_COMPOSITION_BROAD_MATCH = '''AddMusicCompositionBroadMatch(
     from: {{identifier: "{identifier_1}" }}
     to: {{identifier: "{identifier_2}" }}
   ) {{
@@ -16,7 +16,7 @@ ADD_DIGITAL_DOCUMENT_BROAD_MATCH = '''AddDigitalDocumentBroadMatch(
     }}
   }}'''
 
-REMOVE_DIGITAL_DOCUMENT_BROAD_MATCH = '''RemoveDigitalDocumentBroadMatch(
+REMOVE_DIGITAL_DOCUMENT_BROAD_MATCH = '''RemoveMusicCompositionBroadMatch(
     from: {{identifier: "{identifier_1}" }}
     to: {{identifier: "{identifier_2}" }}
   ) {{
@@ -28,7 +28,7 @@ REMOVE_DIGITAL_DOCUMENT_BROAD_MATCH = '''RemoveDigitalDocumentBroadMatch(
     }}
   }}'''
 
-ADD_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''AddDigitalDocumentExampleOfWork(
+ADD_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''AddDMusicCompositionExampleOfWork(
     from: {{identifier: "{identifier_1}"}}
     to: {{identifier: "{identifier_2}"}}
 ) {{
@@ -40,7 +40,7 @@ ADD_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''AddDigitalDocumentExampleOfWo
     }}
 }}'''
 
-MERGE_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''MergeDigitalDocumentExampleOfWork(
+MERGE_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''MergeMusicCompositionExampleOfWork(
     from: {{identifier: "{identifier_1}"}}
     to: {{identifier: "{identifier_2}"}}
 ) {{
@@ -52,7 +52,7 @@ MERGE_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''MergeDigitalDocumentExample
     }}
 }}'''
 
-REMOVE_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''RemoveDigitalDocumentExampleOfWork(
+REMOVE_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''RemoveMusicCompositionExampleOfWork(
     from: {{identifier: "{identifier_1}"}}
     to: {{identifier: "{identifier_2}"}}
 ) {{
@@ -64,19 +64,19 @@ REMOVE_DIGITAL_DOCUMENT_WORK_EXAMPLE_COMPOSITION = '''RemoveDigitalDocumentExamp
     }}
 }}'''
 
-CREATE_DIGITAL_DOCUMENT = '''CreateDigitalDocument(
+CREATE_DIGITAL_DOCUMENT = '''CreateMusicComposition(
         {parameters}
   ) {{
     identifier
   }}'''
 
-UPDATE_DIGITAL_DOCUMENT = '''UpdateDigitalDocument(
+UPDATE_DIGITAL_DOCUMENT = '''UpdateMusicComposition(
         {parameters}
 ) {{
   identifier
 }}'''
 
-DELETE_DIGITAL_DOCUMENT = '''DeleteDigitalDocument(
+DELETE_DIGITAL_DOCUMENT = '''DeleteMusicComposition(
     {parameters}
   ) {{
     identifier
@@ -84,7 +84,7 @@ DELETE_DIGITAL_DOCUMENT = '''DeleteDigitalDocument(
 
 ADD_DIGITAL_DOCUMENT_TO_CONTROL_ACTION_MUTATION = """AddActionInterfaceThingInterface (
             from: {{identifier: "{identifier_2}", type: ControlAction}}
-            to: {{identifier: "{identifier_1}", type: DigitalDocument}}
+            to: {{identifier: "{identifier_1}", type: MusicComposition}}
             field: result
         ) {{
             from {{
@@ -96,34 +96,37 @@ ADD_DIGITAL_DOCUMENT_TO_CONTROL_ACTION_MUTATION = """AddActionInterfaceThingInte
         }}"""
 
 
-def mutation_create_document(document_name: str, publisher: str, contributor: str, creator: str, source: str,
-                             description: str, subject: str, language: str, formatin="text/html"):
-    """Returns a mutation for creating a digital document object
+def mutation_create_music_composition(title: str, contributor: str, creator: str, source: str, publisher: str,
+                           language: str, inLanguage:str, formatin:str="text/html", name: str=None, description: str=None):
+    """Returns a mutation for creating a music composition object
     Arguments:
-        document_name: The name of the digital document.
-        publisher: The person, organization or service responsible for making the artist information available.
-        contributor: A person, an organization, or a service responsible for contributing the artist to the web resource.
-            This can be either a name or a base URL.
+        title: The title of the page from which the music composition information was extracted.      
+        contributor: A person, an organization, or a service responsible for contributing the music composition to the web resource. This can be either a name or a base URL.
         creator: The person, organization or service who created the thing the web resource is about.
         source: The URL of the web resource to be represented by the node.
-        description: An account of the artist.
         language: The language the metadata is written in. Currently supported languages are en,es,ca,nl,de,fr
+        inLanguage: The language of the music composition. Currently supported languages are en,es,ca,nl,de,fr
+        formatin: A MimeType of the format of the music composition, default is "text/html"
+        name: The name of the music composition.
+        description: An account of the music composition..
 
 
     Returns:
-        The string for the mutation for creating the document object.
+        The string for the mutation for creating the music composition.
     Raises:
-        UnsupportedLanguageException if the input language is not one of the supported languages.
+        UnsupportedLanguageException if the input language or inLanguage is not one of the supported languages.
     """
     if language not in SUPPORTED_LANGUAGES:
         raise UnsupportedLanguageException(language)
+
+    if inLanguage not in SUPPORTED_LANGUAGES:
+        raise UnsupportedLanguageException(inLanguage)
 
     if "/" not in formatin:
         raise MimeTypeException(formatin)
 
     args = {
-        "title": document_name,
-        "name": document_name,
+        "title": title,
         "publisher": publisher,
         "contributor": contributor,
         "creator": creator,
