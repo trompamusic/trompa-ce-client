@@ -2,7 +2,8 @@
 
 # To be added EntryPoint, ControlAction, PropertyValueSpecification and Property
 from trompace.exceptions import UnsupportedLanguageException
-from . import make_parameters, MUTATION
+from .. import make_parameters
+from . import MUTATION
 from ..constants import SUPPORTED_LANGUAGES
 
 
